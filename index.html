@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultimate RPS Battle</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes shake {
+            0%, 100% { transform: translateY(0); }
+            25% { transform: translateY(-10px); }
+            75% { transform: translateY(10px); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        @keyframes winnerGlow {
+            0% { box-shadow: 0 0 5px rgba(255, 255, 255, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.8); }
+            100% { box-shadow: 0 0 5px rgba(255, 255, 255, 0.5); }
+        }
+        
+        .shake {
+            animation: shake 0.5s ease-in-out;
+        }
+        
+        .pulse {
+            animation: pulse 1s infinite;
+        }
+        
+        .winner {
+            animation: winnerGlow 2s infinite;
+        }
+        
+        .choice-btn {
+            transition: all 0.3s ease;
+        }
+        
+        .choice-btn:hover {
+            transform: translateY(-5px);
+        }
+        
+        .versus-line {
+            position: relative;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #fff, transparent);
+        }
+        
+        .versus-text {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1a202c;
+            padding: 0 10px;
+        }
+        
+        .game-container {
+            perspective: 1000px;
+        }
+        
+        .flip-card {
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+        }
+        
+        .flipped {
+            transform: rotateY(180deg);
+        }
+        
+        .front, .back {
+            backface-visibility: hidden;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .back {
+            transform: rotateY(180deg);
+        }
+        
+        .highlight-selection {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 0;
+        }
+        
+        @media (max-width: 640px) {
+            .choice-btn {
+                width: 80px;
+                height: 80px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex flex-col">
+    <header class="py-6 bg-gradient-to-r from-blue-900 to-purple-900 shadow-lg">
+        <div class="container mx-auto px-4">
+            <h1 class="text-4xl md:text-5xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-pink-400">
+                Ultimate RPS Battle
+            </h1>
+        </div>
+    </header>
+
+    <main class="flex-grow container mx-auto px-4 py-8">
+        <div class="flex justify-center mb-8">
+            <button id="toggle-friend" class="px-6 py-3 bg-blue-600 rounded-l-lg font-bold hover:bg-blue-700 transition">Play With Friend</button>
+            <button id="toggle-robot" class="px-6 py-3 bg-purple-600 rounded-r-lg font-bold hover:bg-purple-700 transition">Play With Robot</button>
+        </div>
+
+        <!-- Friend Game Mode -->
+        <div id="friend-game" class="game-container">
+            <div class="flex flex-col items-center">
+                <div class="flex justify-between w-full max-w-4xl mb-8">
+                    <div class="text-center">
+                        <h2 class="text-xl font-bold mb-2">Player 1</h2>
+                        <div id="player1-score" class="text-2xl font-bold">0</div>
+                    </div>
+                    <div class="text-center">
+                        <h2 class="text-xl font-bold mb-2">Round</h2>
+                        <div id="round-friend" class="text-2xl font-bold">0</div>
+                    </div>
+                    <div class="text-center">
+                        <h2 class="text-xl font-bold mb-2">Player 2</h2>
+                        <div id="player2-score" class="text-2xl font-bold">0</div>
+                    </div>
+                </div>
+                
+                <div class="relative w-full max-w-4xl mb-12">
+                    <div class="versus-line"></div>
+                    <div class="versus-text">VS</div>
+                </div>
+                
+                <div class="flex justify-center space-x-6 mb-8">
+                    <div class="text-center">
+                        <div class="w-40 h-40 bg-gray-800 rounded-full flex items-center justify-center relative">
+                            <div id="player1-choice" class="text-6xl"></div>
+                        </div>
+                        <p class="mt-2 font-medium">Player 1</p>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div class="w-40 h-40 bg-gray-800 rounded-full flex items-center justify-center relative">
+                            <div id="player2-choice" class="text-6xl"></div>
+                        </div>
+                        <p class="mt-2 font-medium">Player 2</p>
+                    </div>
+                </div>
+                
+                <div id="friend-result" class="text-2xl font-bold mb-8 text-center h-10"></div>
+                
+                <div class="flex justify-center space-x-4 mb-8">
+                    <button class="choice-btn w-24 h-24 bg-blue-900 rounded-full flex items-center justify-center text-4xl hover:bg-blue-800" data-choice="✊" onclick="makeFriendChoice(this, 'player1')">✊</button>
+                    <button class="choice-btn w-24 h-24 bg-green-900 rounded-full flex items-center justify-center text-4xl hover:bg-green-800" data-choice="✋" onclick="makeFriendChoice(this, 'player1')">✋</button>
+                    <button class="choice-btn w-24 h-24 bg-red-900 rounded-full flex items-center justify-center text-4xl hover:bg-red-800" data-choice="✌️" onclick="makeFriendChoice(this, 'player1')">✌️</button>
+                </div>
+                
+                <div class="flex justify-center space-x-4">
+                    <button class="choice-btn w-24 h-24 bg-blue-900 rounded-full flex items-center justify-center text-4xl hover:bg-blue-800" data-choice="✊" onclick="makeFriendChoice(this, 'player2')">✊</button>
+                    <button class="choice-btn w-24 h-24 bg-green-900 rounded-full flex items-center justify-center text-4xl hover:bg-green-800" data-choice="✋" onclick="makeFriendChoice(this, 'player2')">✋</button>
+                    <button class="choice-btn w-24 h-24 bg-red-900 rounded-full flex items-center justify-center text-4xl hover:bg-red-800" data-choice="✌️" onclick="makeFriendChoice(this, 'player2')">✌️</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Robot Game Mode -->
+        <div id="robot-game" class="hidden game-container">
+            <div class="flex flex-col items-center">
+                <div class="flex justify-between w-full max-w-4xl mb-8">
+                    <div class="text-center">
+                        <h2 class="text-xl font-bold mb-2">You</h2>
+                        <div id="player-score" class="text-2xl font-bold">0</div>
+                    </div>
+                    <div class="text-center">
+                        <h2 class="text-xl font-bold mb-2">Round</h2>
+                        <div id="round-robot" class="text-2xl font-bold">0</div>
+                    </div>
+                    <div class="text-center">
+                        <h2 class="text-xl font-bold mb-2">Robot</h2>
+                        <div id="robot-score" class="text-2xl font-bold">0</div>
+                    </div>
+                </div>
+                
+                <div class="relative w-full max-w-4xl mb-12">
+                    <div class="versus-line"></div>
+                    <div class="versus-text">VS</div>
+                </div>
+                
+                <div class="flex justify-center space-x-6 mb-8">
+                    <div class="text-center">
+                        <div class="w-40 h-40 bg-gray-800 rounded-full flex items-center justify-center relative">
+                            <div id="player-choice" class="text-6xl"></div>
+                        </div>
+                        <p class="mt-2 font-medium">You</p>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div class="w-40 h-40 bg-gray-800 rounded-full flex items-center justify-center relative">
+                            <div id="robot-choice" class="text-6xl"></div>
+                        </div>
+                        <p class="mt-2 font-medium">Robot</p>
+                    </div>
+                </div>
+                
+                <div id="robot-result" class="text-2xl font-bold mb-8 text-center h-10"></div>
+                
+                <div class="flex justify-center space-x-4">
+                    <button class="choice-btn w-24 h-24 bg-blue-900 rounded-full flex items-center justify-center text-4xl hover:bg-blue-800" data-choice="✊" onclick="makeRobotChoice(this)">✊</button>
+                    <button class="choice-btn w-24 h-24 bg-green-900 rounded-full flex items-center justify-center text-4xl hover:bg-green-800" data-choice="✋" onclick="makeRobotChoice(this)">✋</button>
+                    <button class="button-3d transform transition hover:scale-110 choice-btn w-24 h-24 bg-red-900 rounded-full flex items-center justify-center text-4xl hover:bg-red-800" data-choice="✌️" onclick="makeRobotChoice(this)">✌️</button>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <footer class="py-4 bg-gray-800 text-center">
+        <p>Made with ❤️ by Rashmiranjan Shaw | © 2023 Ultimate RPS Battle</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
