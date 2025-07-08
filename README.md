@@ -1,6 +1,6 @@
 # Rock-Paper-Scissors-Game
 ## RPM Battle ⚔️
-### – Rock ✊ Paper 📄 Scissors ✌️
+### Rock ✊ Paper 📄 Scissors ✌️
 
 **RPM Battle** is a modern, browser-based version of the classic Rock-Paper-Scissors game, built with **HTML**, **CSS**, and **JavaScript**. It offers two exciting modes:
 
@@ -13,9 +13,7 @@ Whether you're going solo or battling a friend, RPM Battle brings fast-paced fun
 
 ## 🔗 Live Demo
 
-👉 [Play Now](https://your-live-demo-link.com)
-
-> *(Replace this with your actual GitHub Pages, Netlify, or Vercel link)*
+[![Screen Recording](https://github.com/user-attachments/assets/e3321977-ed94-45ec-80c4-b0423c71787a)](https://rashmiranjan07.github.io/Rock-Paper-Scissors-Game/)
 
 ---
 
