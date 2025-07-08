@@ -1,5 +1,6 @@
 # Rock-Paper-Scissors-Game
-# RPM Battle ⚔️ – Rock ✊ Paper 📄 Scissors ✌️ Showdown
+## RPM Battle ⚔️
+### – Rock ✊ Paper 📄 Scissors ✌️
 
 **RPM Battle** is a modern, browser-based version of the classic Rock-Paper-Scissors game, built with **HTML**, **CSS**, and **JavaScript**. It offers two exciting modes:
 
