@@ -39,13 +39,6 @@ Whether you're going solo or battling a friend, RPM Battle brings fast-paced fun
 
 ---
 
-## 📸 Screenshots
-
-![screenshot](screenshot.png)
-
-> *(Optional: Add an actual screenshot named `screenshot.png` to your repo)*
-
----
 
 ## 🛠 Tech Stack
 
@@ -59,6 +52,6 @@ Whether you're going solo or battling a friend, RPM Battle brings fast-paced fun
 
 1. **Clone the repo**
 ```bash
-git clone https://github.com/your-username/rpm-battle.git
+git clone https://github.com/rashmiranjan07/rpm-battle.git
 
 ``` 
