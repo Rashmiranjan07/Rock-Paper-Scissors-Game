@@ -1,217 +1,389 @@
 
-        // Game state
-        const gameState = {
-            friend: {
-                player1Choice: null,
-                player2Choice: null,
-                player1Score: 0,
-                player2Score: 0,
-                round: 0
-            },
-            robot: {
-                playerChoice: null,
-                robotChoice: null,
-                playerScore: 0,
-                robotScore: 0,
-                round: 0
-            }
-        };
-        
-        // DOM elements
-        const friendGame = document.getElementById('friend-game');
-        const robotGame = document.getElementById('robot-game');
-        const toggleFriendBtn = document.getElementById('toggle-friend');
-        const toggleRobotBtn = document.getElementById('toggle-robot');
-        
-        // Initialize game
         document.addEventListener('DOMContentLoaded', () => {
-            toggleFriendBtn.classList.add('bg-blue-700');
-            toggleRobotBtn.classList.remove('bg-purple-700');
-            
-            toggleFriendBtn.addEventListener('click', () => {
-                friendGame.classList.remove('hidden');
-                robotGame.classList.add('hidden');
-                toggleFriendBtn.classList.add('bg-blue-700');
-                toggleRobotBtn.classList.remove('bg-purple-700');
-            });
-            
-            toggleRobotBtn.addEventListener('click', () => {
-                robotGame.classList.remove('hidden');
-                friendGame.classList.add('hidden');
-                toggleRobotBtn.classList.add('bg-purple-700');
-                toggleFriendBtn.classList.remove('bg-blue-700');
-            });
-        });
-        
-        // Friend game logic
-        function makeFriendChoice(btn, player) {
-            const choice = btn.getAttribute('data-choice');
-            
-            if (player === 'player1') {
-                gameState.friend.player1Choice = choice;
-                document.getElementById('player1-choice').textContent = choice;
-                document.querySelectorAll('[onclick*="player1"]').forEach(b => b.disabled = true);
-            } else {
-                gameState.friend.player2Choice = choice;
-                document.getElementById('player2-choice').textContent = choice;
-                document.querySelectorAll('[onclick*="player2"]').forEach(b => b.disabled = true);
-            }
-            
-            animateChoice(btn);
-            
-            if (gameState.friend.player1Choice && gameState.friend.player2Choice) {
-                setTimeout(() => {
-                    determineFriendWinner();
-                }, 500);
-            }
-        }
-        
-        function determineFriendWinner() {
-            gameState.friend.round++;
-            document.getElementById('round-friend').textContent = gameState.friend.round;
-            
-            const p1 = gameState.friend.player1Choice;
-            const p2 = gameState.friend.player2Choice;
-            const resultText = document.getElementById('friend-result');
-            
-            if (p1 === p2) {
-                resultText.textContent = "It's a tie!";
-                resultText.className = "text-2xl font-bold mb-8 text-center h-10 text-yellow-400";
-            } else if (
-                (p1 === '✊' && p2 === '✌️') ||
-                (p1 === '✋' && p2 === '✊') ||
-                (p1 === '✌️' && p2 === '✋')
-            ) {
-                gameState.friend.player1Score++;
-                document.getElementById('player1-score').textContent = gameState.friend.player1Score;
-                resultText.textContent = "Player 1 wins!";
-                resultText.className = "text-2xl font-bold mb-8 text-center h-10 text-green-400 shake";
-                document.getElementById('player1-choice').parentElement.classList.add('winner', 'pulse');
-            } else {
-                gameState.friend.player2Score++;
-                document.getElementById('player2-score').textContent = gameState.friend.player2Score;
-                resultText.textContent = "Player 2 wins!";
-                resultText.className = "text-2xl font-bold mb-8 text-center h-10 text-green-400 shake";
-                document.getElementById('player2-choice').parentElement.classList.add('winner', 'pulse');
-            }
-            
-            setTimeout(() => {
-                resetFriendChoices();
-            }, 1500);
-        }
-        
-        function resetFriendChoices() {
-            gameState.friend.player1Choice = null;
-            gameState.friend.player2Choice = null;
-            document.getElementById('player1-choice').textContent = '';
-            document.getElementById('player2-choice').textContent = '';
-            document.getElementById('friend-result').textContent = '';
-            document.getElementById('friend-result').className = "text-2xl font-bold mb-8 text-center h-10";
-            document.querySelectorAll('.choice-btn').forEach(b => b.disabled = false);
-            document.getElementById('player1-choice').parentElement.classList.remove('winner', 'pulse');
-            document.getElementById('player2-choice').parentElement.classList.remove('winner', 'pulse');
-        }
-        
-        // Robot game logic
-        function makeRobotChoice(btn) {
-            const choices = ['✊', '✋', '✌️'];
-            const playerChoice = btn.getAttribute('data-choice');
-            
-            gameState.robot.playerChoice = playerChoice;
-            document.getElementById('player-choice').textContent = playerChoice;
-            
-            // Disable buttons
-            document.querySelectorAll('#robot-game .choice-btn').forEach(b => b.disabled = true);
-            
-            // Animate player choice
-            animateChoice(btn);
-            
-            // Robot "thinking" animation
-            const robotEl = document.getElementById('robot-choice');
-            let counter = 0;
-            const interval = setInterval(() => {
-                robotEl.textContent = choices[counter % 3];
-                counter++;
-                
-                if (counter > 5) {
-                    clearInterval(interval);
+            // Game state
+            const gameState = {
+                robot: {
+                    playerScore: 0,
+                    robotScore: 0,
+                    rounds: 0,
+                    playerChoice: null,
+                    robotChoice: null
+                },
+                friend: {
+                    player1Score: 0,
+                    player2Score: 0,
+                    rounds: 0,
+                    player1Choice: null,
+                    player2Choice: null,
+                    currentPlayer: 1
+                }
+            };
+
+            // Mode selection
+            const modeBtns = document.querySelectorAll('.mode-btn');
+            const gameSections = document.querySelectorAll('.game-section');
+
+            modeBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    modeBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
                     
-                    // Robot makes random choice
-                    const robotChoice = choices[Math.floor(Math.random() * choices.length)];
-                    gameState.robot.robotChoice = robotChoice;
-                    robotEl.textContent = robotChoice;
+                    gameSections.forEach(section => section.classList.remove('active'));
+                    document.getElementById(`${btn.dataset.mode}-game`).classList.add('active');
+                    
+                    // Create particles on mode change
+                    createParticles(50);
+                });
+            });
+
+            // VS Robot Game Logic
+            const robotChoices = document.querySelectorAll('#robot-game .choice');
+            const playerSelection = document.getElementById('player-selection');
+            const robotSelection = document.getElementById('robot-selection');
+            const resultDisplay = document.getElementById('result');
+            const playerScoreDisplay = document.getElementById('player-score');
+            const robotScoreDisplay = document.getElementById('robot-score');
+            const resetRobotBtn = document.getElementById('reset-robot');
+
+            robotChoices.forEach(choice => {
+                choice.addEventListener('click', () => {
+                    if (gameState.robot.playerChoice) return;
+                    
+                    const playerChoice = choice.dataset.choice;
+                    gameState.robot.playerChoice = playerChoice;
+                    
+                    // Animate player selection
+                    animateSelection(choice, playerSelection, playerChoice);
                     
                     setTimeout(() => {
-                        determineRobotWinner();
-                    }, 500);
-                }
-            }, 200);
-        }
-        
-        function determineRobotWinner() {
-            gameState.robot.round++;
-            document.getElementById('round-robot').textContent = gameState.robot.round;
-            
-            const playerChoice = gameState.robot.playerChoice;
-            const robotChoice = gameState.robot.robotChoice;
-            const resultText = document.getElementById('robot-result');
-            
-            if (playerChoice === robotChoice) {
-                resultText.textContent = "It's a tie!";
-                resultText.className = "text-2xl font-bold mb-8 text-center h-10 text-yellow-400";
-            } else if (
-                (playerChoice === '✊' && robotChoice === '✌️') ||
-                (playerChoice === '✋' && robotChoice === '✊') ||
-                (playerChoice === '✌️' && robotChoice === '✋')
-            ) {
-                gameState.robot.playerScore++;
-                document.getElementById('player-score').textContent = gameState.robot.playerScore;
-                resultText.textContent = "You win!";
-                resultText.className = "text-2xl font-bold mb-8 text-center h-10 text-green-400 shake";
-                document.getElementById('player-choice').parentElement.classList.add('winner', 'pulse');
-            } else {
-                gameState.robot.robotScore++;
-                document.getElementById('robot-score').textContent = gameState.robot.robotScore;
-                resultText.textContent = "Robot wins!";
-                resultText.className = "text-2xl font-bold mb-8 text-center h-10 text-red-400 shake";
-                document.getElementById('robot-choice').parentElement.classList.add('winner', 'pulse');
-            }
-            
-            setTimeout(() => {
-                resetRobotChoices();
-            }, 1500);
-        }
-        
-        function resetRobotChoices() {
-            gameState.robot.playerChoice = null;
-            gameState.robot.robotChoice = null;
-            document.getElementById('player-choice').textContent = '';
-            document.getElementById('robot-choice').textContent = '';
-            document.getElementById('robot-result').textContent = '';
-            document.getElementById('robot-result').className = "text-2xl font-bold mb-8 text-center h-10";
-            document.querySelectorAll('#robot-game .choice-btn').forEach(b => b.disabled = false);
-            document.getElementById('player-choice').parentElement.classList.remove('winner', 'pulse');
-            document.getElementById('robot-choice').parentElement.classList.remove('winner', 'pulse');
-        }
-        
-        // Animation helper
-        function animateChoice(btn) {
-            const highlight = document.createElement('div');
-            highlight.className = 'highlight-selection';
-            btn.parentNode.insertBefore(highlight, btn);
-            
-            setTimeout(() => {
-                highlight.style.transform = 'translate(-50%, -50%) scale(1.5)';
-                highlight.style.opacity = '0';
+                        // Robot makes random choice
+                        const choices = ['rock', 'paper', 'scissors'];
+                        const robotChoice = choices[Math.floor(Math.random() * 3)];
+                        gameState.robot.robotChoice = robotChoice;
+                        
+                        // Find the corresponding choice element for animation
+                        const robotChoiceEl = Array.from(robotChoices).find(el => el.dataset.choice === robotChoice);
+                        
+                        // Animate robot selection
+                        animateSelection(robotChoiceEl, robotSelection, robotChoice);
+                        
+                        setTimeout(() => {
+                            // Determine winner
+                            const result = determineWinner(playerChoice, robotChoice);
+                            displayResult(result, 'robot');
+                            
+                            // Show celebration if player wins
+                            if (result === 'player') {
+                                celebrate();
+                            }
+                        }, 1000);
+                    }, 1000);
+                });
+            });
+
+            // VS Friend Game Logic
+            const friendChoices = document.querySelectorAll('#friend-game .choice');
+            const player1Selection = document.getElementById('player1-selection');
+            const player2Selection = document.getElementById('player2-selection');
+            const friendResultDisplay = document.getElementById('friend-result');
+            const player1ScoreDisplay = document.getElementById('player1-score');
+            const player2ScoreDisplay = document.getElementById('player2-score');
+            const resetFriendBtn = document.getElementById('reset-friend');
+
+            friendChoices.forEach(choice => {
+                choice.addEventListener('click', () => {
+                    if (gameState.friend.currentPlayer === 1) {
+                        if (gameState.friend.player1Choice) return;
+                        
+                        const playerChoice = choice.dataset.choice;
+                        gameState.friend.player1Choice = playerChoice;
+                        
+                        animateSelection(choice, player1Selection, playerChoice);
+                        gameState.friend.currentPlayer = 2;
+                        
+                        // Inform player 2 to make choice
+                        friendResultDisplay.textContent = "Player 2, make your choice!";
+                    } else {
+                        if (gameState.friend.player2Choice) return;
+                        
+                        const playerChoice = choice.dataset.choice;
+                        gameState.friend.player2Choice = playerChoice;
+                        
+                        animateSelection(choice, player2Selection, playerChoice);
+                        
+                        setTimeout(() => {
+                            const result = determineWinner(
+                                gameState.friend.player1Choice, 
+                                gameState.friend.player2Choice,
+                                'friend'
+                            );
+                            displayResult(result, 'friend');
+                            
+                            // Reset for next round
+                            setTimeout(() => {
+                                gameState.friend.player1Choice = null;
+                                gameState.friend.player2Choice = null;
+                                gameState.friend.currentPlayer = 1;
+                                document.getElementById('player1-selection').innerHTML = '<i class="fas fa-user"></i>';
+                                document.getElementById('player2-selection').innerHTML = '<i class="fas fa-user"></i>';
+                                friendResultDisplay.textContent = "Player 1, choose again!";
+                                friendResultDisplay.classList.remove('active');
+                            }, 2500);
+                        }, 1000);
+                    }
+                });
+            });
+
+            // Reset buttons
+            resetRobotBtn.addEventListener('click', () => resetGame('robot'));
+            resetFriendBtn.addEventListener('click', () => resetGame('friend'));
+
+            // Helper functions
+            function animateSelection(choiceEl, selectionEl, choice) {
+                // Add bounce animation to selected choice
+                choiceEl.classList.add('bounce-animation');
                 
+                // Remove animation after a delay
                 setTimeout(() => {
-                    highlight.remove();
+                    choiceEl.classList.remove('bounce-animation');
+                }, 500);
+                
+                // Update selection display
+                setTimeout(() => {
+                    selectionEl.innerHTML = `<i class="fas fa-hand-${choice}"></i>`;
+                    selectionEl.style.backgroundColor = getChoiceColor(choice);
                 }, 300);
-            }, 100);
-            
-            btn.classList.add('shake');
+            }
+
+            function getChoiceColor(choice) {
+                switch(choice) {
+                    case 'rock': return '#a29bfe';
+                    case 'paper': return '#74b9ff';
+                    case 'scissors': return '#ffeaa7';
+                    default: return '#fff';
+                }
+            }
+
+            function determineWinner(a, b, mode = 'robot') {
+                gameState[mode].rounds++;
+                if (mode === 'robot') {
+                    document.getElementById('robot-round').textContent = gameState.robot.rounds;
+                }
+                
+                if (a === b) {
+                    return 'draw';
+                }
+                
+                if (
+                    (a === 'rock' && b === 'scissors') ||
+                    (a === 'scissors' && b === 'paper') ||
+                    (a === 'paper' && b === 'rock')
+                ) {
+                    if (mode === 'robot') {
+                        gameState.robot.playerScore++;
+                    } else {
+                        gameState.friend.player1Score++;
+                    }
+                    return mode === 'robot' ? 'player' : 'player1';
+                } else {
+                    if (mode === 'robot') {
+                        gameState.robot.robotScore++;
+                    } else {
+                        gameState.friend.player2Score++;
+                    }
+                    return mode === 'robot' ? 'robot' : 'player2';
+                }
+            }
+
+            function autoResetRound(mode) {
+                setTimeout(() => {
+                    if (mode === 'robot') {
+                        gameState.robot.playerChoice = null;
+                        gameState.robot.robotChoice = null;
+                        document.getElementById('player-selection').innerHTML = '<i class="fas fa-question"></i>';
+                        document.getElementById('robot-selection').innerHTML = '<i class="fas fa-robot"></i>';
+                        document.getElementById('result').textContent = '';
+                        document.getElementById('result').classList.remove('winner');
+                    } else {
+                        gameState.friend.player1Choice = null;
+                        gameState.friend.player2Choice = null;
+                        gameState.friend.currentPlayer = 1;
+                        document.getElementById('player1-selection').innerHTML = '<i class="fas fa-user"></i>';
+                        document.getElementById('player2-selection').innerHTML = '<i class="fas fa-user"></i>';
+                        document.getElementById('friend-result').textContent = 'Player 1, make your choice!';
+                        document.getElementById('friend-result').classList.remove('winner');
+                    }
+                }, 2500);
+            }
+
+            function displayResult(result, mode) {
+                const resultDisplay = mode === 'robot' ? document.getElementById('result') : document.getElementById('friend-result');
+                const scoreboard = mode === 'robot' ? document.querySelector('#robot-game .scoreboard') : document.querySelector('#friend-game .scoreboard');
+                
+                // Activate scoreboard animation
+                scoreboard.classList.add('active');
+                setTimeout(() => {
+                    scoreboard.classList.remove('active');
+                }, 1000);
+
+                // Activate result display
+                resultDisplay.classList.add('active');
+                
+                switch(result) {
+                    case 'player':
+                    case 'player1':
+                        resultDisplay.textContent = mode === 'robot' ? '🎉 You win! 🎉' : '🎉 Player 1 wins! 🎉';
+                        resultDisplay.classList.add('winner-animation');
+                        celebrate();
+                        break;
+                    case 'player2':
+                        resultDisplay.textContent = 'Player 2 wins!';
+                        resultDisplay.classList.add('winner-animation');
+                        break;
+                    case 'robot':
+                        resultDisplay.textContent = 'Robot wins!';
+                        resultDisplay.classList.add('winner-animation');
+                        break;
+                    case 'draw':
+                        resultDisplay.textContent = 'It\'s a draw!';
+                        resultDisplay.classList.remove('winner-animation');
+                        break;
+                }
+                
+                // Update scores
+                if (mode === 'robot') {
+                    playerScoreDisplay.textContent = gameState.robot.playerScore;
+                    robotScoreDisplay.textContent = gameState.robot.robotScore;
+                    
+                    // Reset for next round
+                    setTimeout(() => {
+                        gameState.robot.playerChoice = null;
+                        gameState.robot.robotChoice = null;
+                        playerSelection.innerHTML = '<i class="fas fa-question"></i>';
+                        robotSelection.innerHTML = '<i class="fas fa-robot"></i>';
+                        playerSelection.style.backgroundColor = '#fff';
+                        robotSelection.style.backgroundColor = '#fff';
+                        resultDisplay.textContent = '';
+                        resultDisplay.classList.remove('winner-animation');
+                    }, 2000);
+                } else {
+                    player1ScoreDisplay.textContent = gameState.friend.player1Score;
+                    player2ScoreDisplay.textContent = gameState.friend.player2Score;
+                    
+                    setTimeout(() => {
+                        resultDisplay.classList.remove('winner-animation');
+                    }, 2000);
+                }
+            }
+
+            function resetGame(mode) {
+                if (mode === 'robot') {
+                    gameState.robot.playerScore = 0;
+                    gameState.robot.robotScore = 0;
+                    gameState.robot.rounds = 0;
+                    gameState.robot.playerChoice = null;
+                    gameState.robot.robotChoice = null;
+                    
+                    playerScoreDisplay.textContent = '0';
+                    robotScoreDisplay.textContent = '0';
+                    playerSelection.innerHTML = '<i class="fas fa-question"></i>';
+                    robotSelection.innerHTML = '<i class="fas fa-robot"></i>';
+                    playerSelection.style.backgroundColor = '#fff';
+                    robotSelection.style.backgroundColor = '#fff';
+                    resultDisplay.textContent = '';
+                    resultDisplay.classList.remove('winner-animation');
+                } else {
+                    gameState.friend.player1Score = 0;
+                    gameState.friend.player2Score = 0;
+                    gameState.friend.rounds = 0;
+                    gameState.friend.player1Choice = null;
+                    gameState.friend.player2Choice = null;
+                    gameState.friend.currentPlayer = 1;
+                    
+                    player1ScoreDisplay.textContent = '0';
+                    player2ScoreDisplay.textContent = '0';
+                    player1Selection.innerHTML = '<i class="fas fa-user"></i>';
+                    player2Selection.innerHTML = '<i class="fas fa-user"></i>';
+                    player1Selection.style.backgroundColor = '#fff';
+                    player2Selection.style.backgroundColor = '#fff';
+                    friendResultDisplay.textContent = 'Player 1, make your choice!';
+                    friendResultDisplay.classList.remove('winner-animation');
+                }
+                
+                // Create celebration animation on reset
+                createParticles(100);
+            }
+
+            function celebrate() {
+                createConfetti(30);
+                createParticles(50);
+            }
+
+            function createConfetti(count) {
+                for (let i = 0; i < count; i++) {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = `${Math.random() * 100}vw`;
+                    confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 70%)`;
+                    confetti.style.animationDuration = `${3 + Math.random() * 2}s`;
+                    document.body.appendChild(confetti);
+                    
+                    setTimeout(() => {
+                        confetti.remove();
+                    }, 5000);
+                }
+            }
+
+            function createParticles(count) {
+                for (let i = 0; i < count; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    
+                    // Random position
+                    const x = Math.random() * window.innerWidth;
+                    const y = Math.random() * window.innerHeight;
+                    
+                    // Random properties
+                    const size = Math.random() * 8 + 2;
+                    const color = `hsl(${Math.random() * 360}, 100%, 70%)`;
+                    
+                    particle.style.width = `${size}px`;
+                    particle.style.height = `${size}px`;
+                    particle.style.backgroundColor = color;
+                    particle.style.left = `${x}px`;
+                    particle.style.top = `${y}px`;
+                    
+                    // Animation
+                    const duration = Math.random() * 3 + 2;
+                    const angle = Math.random() * Math.PI * 2;
+                    const distance = Math.random() * 100 + 50;
+                    
+                    particle.animate([
+                        { 
+                            opacity: 1,
+                            transform: `translate(0, 0) rotate(0deg)`
+                        },
+                        { 
+                            opacity: 0,
+                            transform: `translate(${Math.cos(angle) * distance}px, ${Math.sin(angle) * distance}px) rotate(${Math.random() * 360}deg)`
+                        }
+                    ], {
+                        duration: duration * 1000,
+                        easing: 'cubic-bezier(0.4, 0, 0.2, 1)'
+                    });
+                    
+                    document.body.appendChild(particle);
+                    
+                    // Remove after animation
+                    setTimeout(() => {
+                        particle.remove();
+                    }, duration * 1000);
+                }
+            }
+
+            // Initial animations
             setTimeout(() => {
-                btn.classList.remove('shake');
-            }, 500);
-        }
-    
+                createParticles(30);
+            }, 1000);
+        });
+   

@@ -1,137 +1,132 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ultimate RPS Battle</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Ultimate RPS Challenge</title>
     <link rel="stylesheet" href="style.css">
    
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
-<body class="bg-gray-900 text-white min-h-screen flex flex-col">
-    <header class="py-6 bg-gradient-to-r from-blue-900 to-purple-900 shadow-lg">
-        <div class="container mx-auto px-4">
-            <h1 class="text-4xl md:text-5xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-pink-400">
-                Ultimate RPS Battle
-            </h1>
-        </div>
-    </header>
+<body>
+    <div class="container">
+        <header>
+            <h1 class="floating">Ultimate RPS Challenge</h1>
+            <p>Test your luck and strategy in this enhanced Rock, Paper, Scissors game!</p>
+        </header>
 
-    <main class="flex-grow container mx-auto px-4 py-8">
-        <div class="flex justify-center mb-8">
-            <button id="toggle-friend" class="px-6 py-3 bg-blue-600 rounded-l-lg font-bold hover:bg-blue-700 transition">Play With Friend</button>
-            <button id="toggle-robot" class="px-6 py-3 bg-purple-600 rounded-r-lg font-bold hover:bg-purple-700 transition">Play With Robot</button>
+        <div class="mode-selector">
+            <button class="mode-btn active" data-mode="robot">VS Robot</button>
+            <button class="mode-btn" data-mode="friend">VS Friend</button>
         </div>
 
-        <!-- Friend Game Mode -->
-        <div id="friend-game" class="game-container">
-            <div class="flex flex-col items-center">
-                <div class="flex justify-between w-full max-w-4xl mb-8">
-                    <div class="text-center">
-                        <h2 class="text-xl font-bold mb-2">Player 1</h2>
-                        <div id="player1-score" class="text-2xl font-bold">0</div>
+        <!-- VS Robot Game -->
+        <div id="robot-game" class="game-section active">
+            <div class="game-area">
+                <div class="choices">
+                    <div class="choice" data-choice="rock">
+                        <i class="fas fa-hand-rock"></i>
                     </div>
-                    <div class="text-center">
-                        <h2 class="text-xl font-bold mb-2">Round</h2>
-                        <div id="round-friend" class="text-2xl font-bold">0</div>
+                    <div class="choice" data-choice="paper">
+                        <i class="fas fa-hand-paper"></i>
                     </div>
-                    <div class="text-center">
-                        <h2 class="text-xl font-bold mb-2">Player 2</h2>
-                        <div id="player2-score" class="text-2xl font-bold">0</div>
+                    <div class="choice" data-choice="scissors">
+                        <i class="fas fa-hand-scissors"></i>
                     </div>
                 </div>
-                
-                <div class="relative w-full max-w-4xl mb-12">
-                    <div class="versus-line"></div>
-                    <div class="versus-text">VS</div>
-                </div>
-                
-                <div class="flex justify-center space-x-6 mb-8">
-                    <div class="text-center">
-                        <div class="w-40 h-40 bg-gray-800 rounded-full flex items-center justify-center relative">
-                            <div id="player1-choice" class="text-6xl"></div>
+
+                <div class="vs-container">
+                    <div class="player-area">
+                        <div class="selection" id="player-selection">
+                            <i class="fas fa-question"></i>
                         </div>
-                        <p class="mt-2 font-medium">Player 1</p>
+                        <h3>YOU</h3>
                     </div>
-                    
-                    <div class="text-center">
-                        <div class="w-40 h-40 bg-gray-800 rounded-full flex items-center justify-center relative">
-                            <div id="player2-choice" class="text-6xl"></div>
+                    <div class="vs-text">VS</div>
+                    <div class="opponent-area">
+                        <div class="selection" id="robot-selection">
+                            <i class="fas fa-robot"></i>
                         </div>
-                        <p class="mt-2 font-medium">Player 2</p>
+                        <h3>ROBOT</h3>
                     </div>
                 </div>
-                
-                <div id="friend-result" class="text-2xl font-bold mb-8 text-center h-10"></div>
-                
-                <div class="flex justify-center space-x-4 mb-8">
-                    <button class="choice-btn w-24 h-24 bg-blue-900 rounded-full flex items-center justify-center text-4xl hover:bg-blue-800" data-choice="✊" onclick="makeFriendChoice(this, 'player1')">✊</button>
-                    <button class="choice-btn w-24 h-24 bg-green-900 rounded-full flex items-center justify-center text-4xl hover:bg-green-800" data-choice="✋" onclick="makeFriendChoice(this, 'player1')">✋</button>
-                    <button class="choice-btn w-24 h-24 bg-red-900 rounded-full flex items-center justify-center text-4xl hover:bg-red-800" data-choice="✌️" onclick="makeFriendChoice(this, 'player1')">✌️</button>
+
+                <div class="result" id="result"></div>
+            </div>
+
+            <div class="scoreboard">
+                <h3>Scoreboard • Round <span id="robot-round">1</span></h3>
+                <div class="scores">
+                    <div class="score">
+                        <div class="score-label">YOU</div>
+                        <div class="score-value" id="player-score">0</div>
+                    </div>
+                    <div class="score">
+                        <div class="score-label">ROBOT</div>
+                        <div class="score-value" id="robot-score">0</div>
+                    </div>
+                    <div class="score">
+                        <div class="score-label">DRAWS</div>
+                        <div class="score-value" id="draw-score">0</div>
+                    </div>
                 </div>
-                
-                <div class="flex justify-center space-x-4">
-                    <button class="choice-btn w-24 h-24 bg-blue-900 rounded-full flex items-center justify-center text-4xl hover:bg-blue-800" data-choice="✊" onclick="makeFriendChoice(this, 'player2')">✊</button>
-                    <button class="choice-btn w-24 h-24 bg-green-900 rounded-full flex items-center justify-center text-4xl hover:bg-green-800" data-choice="✋" onclick="makeFriendChoice(this, 'player2')">✋</button>
-                    <button class="choice-btn w-24 h-24 bg-red-900 rounded-full flex items-center justify-center text-4xl hover:bg-red-800" data-choice="✌️" onclick="makeFriendChoice(this, 'player2')">✌️</button>
-                </div>
+                <button class="reset-btn" id="reset-robot">Reset Game</button>
             </div>
         </div>
-        
-        <!-- Robot Game Mode -->
-        <div id="robot-game" class="hidden game-container">
-            <div class="flex flex-col items-center">
-                <div class="flex justify-between w-full max-w-4xl mb-8">
-                    <div class="text-center">
-                        <h2 class="text-xl font-bold mb-2">You</h2>
-                        <div id="player-score" class="text-2xl font-bold">0</div>
+
+        <!-- VS Friend Game -->
+        <div id="friend-game" class="game-section">
+            <div class="game-area">
+                <div class="choices">
+                    <div class="choice" data-choice="rock">
+                        <i class="fas fa-hand-rock"></i>
                     </div>
-                    <div class="text-center">
-                        <h2 class="text-xl font-bold mb-2">Round</h2>
-                        <div id="round-robot" class="text-2xl font-bold">0</div>
+                    <div class="choice" data-choice="paper">
+                        <i class="fas fa-hand-paper"></i>
                     </div>
-                    <div class="text-center">
-                        <h2 class="text-xl font-bold mb-2">Robot</h2>
-                        <div id="robot-score" class="text-2xl font-bold">0</div>
+                    <div class="choice" data-choice="scissors">
+                        <i class="fas fa-hand-scissors"></i>
                     </div>
                 </div>
-                
-                <div class="relative w-full max-w-4xl mb-12">
-                    <div class="versus-line"></div>
-                    <div class="versus-text">VS</div>
-                </div>
-                
-                <div class="flex justify-center space-x-6 mb-8">
-                    <div class="text-center">
-                        <div class="w-40 h-40 bg-gray-800 rounded-full flex items-center justify-center relative">
-                            <div id="player-choice" class="text-6xl"></div>
+
+                <div class="vs-container">
+                    <div class="player-area">
+                        <div class="selection" id="player1-selection">
+                            <i class="fas fa-user"></i>
                         </div>
-                        <p class="mt-2 font-medium">You</p>
+                        <h3>PLAYER 1</h3>
                     </div>
-                    
-                    <div class="text-center">
-                        <div class="w-40 h-40 bg-gray-800 rounded-full flex items-center justify-center relative">
-                            <div id="robot-choice" class="text-6xl"></div>
+                    <div class="vs-text">VS</div>
+                    <div class="opponent-area">
+                        <div class="selection" id="player2-selection">
+                            <i class="fas fa-user"></i>
                         </div>
-                        <p class="mt-2 font-medium">Robot</p>
+                        <h3>PLAYER 2</h3>
                     </div>
                 </div>
-                
-                <div id="robot-result" class="text-2xl font-bold mb-8 text-center h-10"></div>
-                
-                <div class="flex justify-center space-x-4">
-                    <button class="choice-btn w-24 h-24 bg-blue-900 rounded-full flex items-center justify-center text-4xl hover:bg-blue-800" data-choice="✊" onclick="makeRobotChoice(this)">✊</button>
-                    <button class="choice-btn w-24 h-24 bg-green-900 rounded-full flex items-center justify-center text-4xl hover:bg-green-800" data-choice="✋" onclick="makeRobotChoice(this)">✋</button>
-                    <button class="button-3d transform transition hover:scale-110 choice-btn w-24 h-24 bg-red-900 rounded-full flex items-center justify-center text-4xl hover:bg-red-800" data-choice="✌️" onclick="makeRobotChoice(this)">✌️</button>
+
+                <div class="result" id="friend-result"></div>
+            </div>
+
+            <div class="scoreboard">
+                <h3>Scoreboard</h3>
+                <div class="scores">
+                    <div class="score">
+                        <div class="score-label">PLAYER 1</div>
+                        <div class="score-value" id="player1-score">0</div>
+                    </div>
+                    <div class="score">
+                        <div class="score-label">PLAYER 2</div>
+                        <div class="score-value" id="player2-score">0</div>
+                    </div>
                 </div>
+                <button class="reset-btn" id="reset-friend">Reset Game</button>
             </div>
         </div>
-    </main>
-    
-    <footer class="py-4 bg-gray-800 text-center">
-        <p>Made with ❤️ by Rashmiranjan Shaw | © 2023 Ultimate RPS Battle</p>
-    </footer>
+    </div>
 
-    <script src="script.js"></script>
+   <script src="script.js"></script>
 </body>
 </html>
