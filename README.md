@@ -56,7 +56,7 @@ git clone https://github.com/rashmiranjan07/rpm-battle.git
 
 ```
 
-# 📞 Contact
+## 📞 Contact
 
 👤 Rashmiranjan shaw
 
