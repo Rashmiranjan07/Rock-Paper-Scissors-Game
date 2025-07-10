@@ -54,4 +54,14 @@ Whether you're going solo or battling a friend, RPM Battle brings fast-paced fun
 ```bash
 git clone https://github.com/rashmiranjan07/rpm-battle.git
 
-``` 
+```
+
+# 📞 Contact
+
+👤 Rashmiranjan shaw
+
+- LinkedIn: [Rashmiranjan shaw](https://www.linkedin.com/in/rashmiranjan-shaw-8333a532a/)
+
+- GitHub: [Rashmiranjan07](https://github.com/Rashmiranjan07)
+
+- Email: heyyrashmiranjan02@gmail.com
