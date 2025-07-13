@@ -7,7 +7,7 @@
 - 🎮 **Play with Robot** – Challenge a smart computer opponent.
 - 👥 **Play with Friend** – Compete in local multiplayer on the same device.
 
-Whether you're going solo or battling a friend, RPM Battle brings fast-paced fun and clean, responsive design for all players.
+Whether you're going solo or battling a friend, RPM Battle brings fast-paced fun and clean, responsive design for all players & the score card is updated in realtime .
 
 ---
 
