@@ -31,11 +31,11 @@ Whether you're going solo or battling a friend, RPM Battle brings fast-paced fun
 
 ## 🎯 Features
 
-- 🧠 Two Game Modes: Play with Robot or with a Friend
-- ⚡ Real-time score tracking
-- ✨ Clean animations and visual feedback
-- 📱 Fully responsive for desktop and mobile
-- 🔁 Replay button to start fresh any time
+- 🧠 Two Game Modes: Play with Robot or with a Friend.
+- ⚡ Real-time score tracking.
+- ✨ Clean animations and visual feedback.
+- 📱 Fully responsive for desktop and mobile.
+- 🔁 Replay button to start fresh any time.
 
 ---
 
