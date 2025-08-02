@@ -39,7 +39,6 @@ Whether you're going solo or battling a friend, RPM Battle brings fast-paced fun
 
 ---
 
-
 ## 🛠 Tech Stack
 
 - **HTML5** – Markup structure
