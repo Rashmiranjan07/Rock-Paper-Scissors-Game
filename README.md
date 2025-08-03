@@ -13,7 +13,14 @@ Whether you're going solo or battling a friend, RPM Battle brings fast-paced fun
 
 ## 🔗 Live Demo
 
+<div align="center">
+  
 [![Screen Recording](https://github.com/user-attachments/assets/e3321977-ed94-45ec-80c4-b0423c71787a)](https://rashmiranjan07.github.io/Rock-Paper-Scissors-Game/)
+
+</div>
+<div align="center">
+:star: Star me on GitHub — it helps!
+</div>
 
 ---
 
