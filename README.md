@@ -71,5 +71,3 @@ git clone https://github.com/rashmiranjan07/rpm-battle.git
 - GitHub: [Rashmiranjan07](https://github.com/Rashmiranjan07)
 
 - Email: heyyrashmiranjan02@gmail.com
-
-  
